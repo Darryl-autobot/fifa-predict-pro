@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>FIFA Predict Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1512; --bg2:#111d17; --card:#132019; --card2:#16261d;
+  --line:#1f3327; --line2:#2a4436;
+  --text:#eaf3ec; --muted:#8ea99a; --muted2:#5f7c6c;
+  --green:#2fbf71; --green2:#22a862; --green-glow:rgba(47,191,113,.35);
+  --amber:#e0a94a; --red:#e0554a; --blue:#4a9fe0;
+  --radius:14px; --radius-sm:9px;
+  --font-head:'Barlow Condensed',sans-serif; --font-body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-body);-webkit-tap-highlight-color:transparent;}
+body{min-height:100vh;background:radial-gradient(600px 300px at 15% -5%, rgba(47,191,113,.10), transparent 60%),radial-gradient(500px 260px at 100% 0%, rgba(74,159,224,.06), transparent 60%),var(--bg);overflow-x:hidden;}
+h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;letter-spacing:.2px;margin:0;}
+p{margin:0;color:var(--muted);line-height:1.5;}
+button{font-family:var(--font-body);cursor:pointer;}
+a{color:var(--green);text-decoration:none;}
+input,select{width:100%;padding:13px 14px;border-radius:var(--radius-sm);border:1px solid var(--line2);background:var(--card2);color:var(--text);font-size:16px;font-family:var(--font-body);}
+input:focus,select:focus{outline:2px solid var(--green);outline-offset:1px;border-color:var(--green);}
+label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px 2px;}
+.field{margin-bottom:14px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 18px;border-radius:12px;border:none;font-size:16px;font-weight:600;min-height:50px;transition:transform .08s ease, filter .15s ease;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:linear-gradient(180deg,var(--green),var(--green2));color:#06150d;box-shadow:0 6px 18px var(--green-glow);}
+.btn-outline{background:transparent;border:1px solid var(--line2);color:var(--text);}
+.btn-ghost{background:transparent;color:var(--muted);border:none;padding:10px;}
+.btn-danger{background:rgba(224,85,74,.15);color:var(--red);border:1px solid rgba(224,85,74,.4);}
+.btn-sm{padding:9px 12px;font-size:13px;min-height:38px;width:auto;border-radius:9px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px 40px;min-height:100vh;}
+.center-col{display:flex;flex-direction:column;align-items:center;text-align:center;}
+.muted{color:var(--muted);font-size:14px;}
+.small{font-size:12.5px;}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600;}
+.pill-active{background:rgba(47,191,113,.15);color:var(--green);}
+.pill-expired{background:rgba(224,85,74,.15);color:var(--red);}
+.pill-disabled{background:rgba(140,150,145,.15);color:var(--muted2);}
+.divider{height:1px;background:var(--line);margin:16px 0;border:none;}
+.stack{display:flex;flex-direction:column;gap:12px;}
+.row{display:flex;gap:10px;align-items:center;}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line2);color:var(--text);padding:12px 18px;border-radius:12px;font-size:14px;z-index:999;max-width:90vw;box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.toast.err{border-color:rgba(224,85,74,.5);color:#ffd9d5;}
+.toast.ok{border-color:rgba(47,191,113,.5);}
+.logo-badge{width:74px;height:74px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%, #1c3527, #0e1a13);border:1px solid var(--line2);font-size:36px;box-shadow:0 0 0 6px rgba(47,191,113,.06), 0 10px 24px rgba(0,0,0,.4);margin-bottom:16px;}
+.brand-title{font-size:34px;letter-spacing:.3px;}
+.brand-sub{margin-top:6px;color:var(--muted);font-size:14.5px;max-width:320px;}
+.telegram-box{margin-top:26px;padding:14px;border-radius:12px;background:var(--card2);border:1px dashed var(--line2);text-align:center;}
+.header-app{position:sticky;top:0;z-index:20;background:rgba(13,21,18,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 3px var(--green-glow);}
+.tabbar{display:flex;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px;margin:16px 0;}
+.tabbar button{flex:1;padding:10px 8px;border-radius:9px;border:none;background:transparent;color:var(--muted);font-weight:600;font-size:13.5px;}
+.tabbar button.active{background:var(--green);color:#06150d;}
+.team-select{background:var(--card2);border:1px solid var(--line2);border-radius:var(--radius);padding:14px;}
+.stat-line{display:flex;gap:14px;margin-top:8px;}
+.stat-chip{flex:1;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;text-align:center;}
+.stat-chip .num{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--green);}
+.stat-chip .lbl{font-size:11px;color:var(--muted);}
+.vs-badge{display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:15px;color:var(--muted2);margin:6px 0;}
+.result-hero{text-align:center;padding:22px 16px;border-radius:var(--radius);background:linear-gradient(180deg,rgba(47,191,113,.12),rgba(47,191,113,.02));border:1px solid var(--line2);}
+.result-hero .big{font-family:var(--font-head);font-size:30px;font-weight:800;color:var(--green);}
+.probbar{height:10px;border-radius:6px;overflow:hidden;display:flex;background:var(--card2);margin-top:10px;}
+.probbar span{height:100%;}
+.hist-item{padding:12px;border-radius:12px;background:var(--card2);border:1px solid var(--line);}
+.tap-zone{width:100%;height:36px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(3,8,6,.7);display:flex;align-items:flex-end;justify-content:center;z-index:100;backdrop-filter:blur(2px);}
+.modal-sheet{background:var(--card);border:1px solid var(--line);border-radius:20px 20px 0 0;padding:22px 18px 30px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;}
+@media (min-width:640px){.modal-overlay{align-items:center;}.modal-sheet{border-radius:20px;}}
+table.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+table.admin-table th{text-align:left;color:var(--muted);font-weight:600;font-size:11.5px;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap;}
+table.admin-table td{padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top;white-space:nowrap;}
+.table-scroll{overflow-x:auto;border-radius:12px;border:1px solid var(--line);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-box{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;}
+.stat-box .n{font-family:var(--font-head);font-size:26px;font-weight:700;}
+.stat-box .l{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.chip-filter{display:inline-flex;padding:7px 13px;border-radius:99px;border:1px solid var(--line2);font-size:12.5px;color:var(--muted);background:transparent;margin-right:6px;margin-bottom:8px;}
+.chip-filter.active{background:var(--green);color:#06150d;border-color:var(--green);}
+.copy-code{font-family:var(--font-head);font-size:22px;letter-spacing:2px;color:var(--green);background:var(--card2);border:1px dashed var(--line2);padding:12px;border-radius:10px;text-align:center;}
+.loader{width:22px;height:22px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--green);animation:spin 0.8s linear infinite;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div id="app"><div class="wrap center-col"><div class="loader" style="margin-top:120px;"></div></div></div>
+
+<script>
+/* ===================== DONNEES EQUIPES (identique à la version Claude) ===================== */
+const TEAM_DATA = [
+{country:"Angleterre",league:"Premier League",teams:[["Manchester City",92,85],["Arsenal",88,89],["Liverpool",90,85],["Chelsea",85,80],["Manchester United",82,78],["Tottenham Hotspur",84,76],["Newcastle United",83,82],["Aston Villa",82,80],["Brighton & Hove Albion",80,76],["West Ham United",77,74],["Crystal Palace",76,77],["Fulham",76,74],["Wolverhampton Wanderers",74,73],["Everton",73,76],["Brentford",76,72],["Nottingham Forest",75,76],["Bournemouth",75,73],["Leeds United",72,70],["Burnley",68,72],["Sunderland",68,68]]},
+{country:"Angleterre",league:"Championship",teams:[["Sheffield United",73,72],["Leicester City",76,73],["Ipswich Town",73,72],["Southampton",74,73],["West Bromwich Albion",71,71],["Norwich City",71,70],["Middlesbrough",71,70],["Coventry City",70,70],["Bristol City",69,70],["Watford",69,69],["Preston North End",68,69],["Millwall",67,69],["Hull City",68,68],["Blackburn Rovers",68,68],["Swansea City",68,68],["Stoke City",68,67],["Sheffield Wednesday",67,68],["Cardiff City",66,67],["Derby County",67,67],["Portsmouth",66,66],["Oxford United",65,66],["Luton Town",66,66],["Plymouth Argyle",65,65],["Queens Park Rangers",65,65]]},
+{country:"Espagne",league:"LaLiga",teams:[["Real Madrid",93,85],["FC Barcelone",91,83],["Atlético Madrid",85,86],["Athletic Bilbao",82,80],["Real Sociedad",80,78],["Real Betis",79,76],["Villarreal",80,75],["Girona",77,73],["Séville FC",76,75],["Valence CF",76,74],["Celta Vigo",75,73],["Osasuna",74,76],["Rayo Vallecano",73,74],["Getafe",71,77],["RCD Majorque",73,74],["Deportivo Alavés",71,73],["Espanyol",70,71],["Levante",69,68],["Elche CF",68,68],["Real Oviedo",68,67]]},
+{country:"Espagne",league:"Segunda División",teams:[["Real Zaragoza",71,70],["Sporting Gijón",70,70],["Racing Santander",69,70],["Deportivo La Coruña",70,69],["Almería",70,70],["Cádiz",68,69],["Las Palmas",71,71],["Leganés",68,69],["Valladolid",69,70],["Mirandés",67,68],["Eibar",67,68],["Huesca",66,67],["Albacete",65,66],["Burgos",65,66],["Córdoba",65,65],["Málaga",67,67],["Granada",68,69],["Andorra",63,64],["Castellón",64,65],["Ceuta",62,63],["Cultural Leonesa",62,63],["Racing Ferrol",63,64]]},
+{country:"Italie",league:"Serie A",teams:[["Napoli",87,85],["Inter Milan",88,86],["Juventus",84,82],["AC Milan",84,81],["Atalanta",83,79],["AS Roma",81,79],["Lazio",79,77],["Fiorentina",79,76],["Bologne",78,78],["Torino",74,75],["Udinese",73,74],["Genoa",72,74],["Cagliari",71,73],["Hellas Vérone",70,72],["Como",71,70],["Parme",70,71],["Lecce",69,70],["Sassuolo",69,69],["Cremonese",67,68],["Pise",67,67]]},
+{country:"Italie",league:"Serie B",teams:[["Sampdoria",70,70],["Palermo",70,70],["Bari",69,69],["Venezia",70,71],["Monza",71,72],["Empoli",70,72],["Frosinone",68,69],["Catanzaro",67,68],["Cesena",67,67],["Modena",66,67],["Cittadella",65,66],["Reggiana",65,66],["Carrarese",64,65],["Spezia",68,69],["Mantova",63,64],["Padova",64,65],["Sudtirol",65,66],["Avellino",64,65],["Juve Stabia",63,64],["Entella",62,63]]},
+{country:"Allemagne",league:"Bundesliga",teams:[["Bayern Munich",92,85],["Bayer Leverkusen",86,83],["RB Leipzig",84,80],["Borussia Dortmund",85,78],["Eintracht Francfort",80,76],["VfB Stuttgart",79,75],["Borussia Mönchengladbach",76,75],["SC Fribourg",76,76],["Werder Brême",74,73],["Mainz 05",73,75],["Union Berlin",72,76],["VfL Wolfsburg",74,74],["TSG Hoffenheim",73,72],["FC Augsbourg",71,73],["FC St. Pauli",69,71],["Hamburger SV",68,69],["1. FC Heidenheim",68,70],["1. FC Cologne",68,68]]},
+{country:"Allemagne",league:"2. Bundesliga",teams:[["Hertha Berlin",71,71],["Schalke 04",70,70],["Fortuna Düsseldorf",68,69],["Hannover 96",69,70],["Karlsruher SC",67,68],["Greuther Fürth",67,67],["Nuremberg",67,68],["Kaiserslautern",67,67],["Darmstadt 98",66,67],["Holstein Kiel",68,69],["VfL Bochum",69,70],["Elversberg",65,66],["Preußen Münster",64,65],["Braunschweig",64,65],["Arminia Bielefeld",64,65],["Regensburg",63,64],["Ulm",63,63],["Magdeburg",64,65]]},
+{country:"France",league:"Ligue 1",teams:[["Paris Saint-Germain",90,83],["AS Monaco",81,77],["Olympique de Marseille",81,76],["LOSC Lille",78,77],["Olympique Lyonnais",79,75],["OGC Nice",76,76],["RC Lens",76,75],["Stade Rennais",75,74],["RC Strasbourg",74,73],["Toulouse FC",72,73],["FC Nantes",71,73],["Stade Brestois",72,71],["AJ Auxerre",69,70],["Angers SCO",68,70],["Le Havre AC",68,69],["FC Metz",67,68],["Paris FC",68,67],["FC Lorient",67,67]]},
+{country:"France",league:"Ligue 2",teams:[["Saint-Étienne",71,71],["Montpellier",70,71],["Reims",70,70],["Amiens",67,68],["Guingamp",67,67],["Grenoble",65,66],["Rodez",64,65],["Laval",65,66],["Clermont",68,69],["Annecy",63,64],["Dunkerque",63,64],["Ajaccio",65,66],["Pau FC",64,65],["Red Star",63,63],["Bastia",65,65],["Martigues",62,63],["Boulogne",61,62],["Troyes",66,67]]},
+{country:"Portugal",league:"Primeira Liga",teams:[["Sporting CP",85,80],["Benfica",85,79],["FC Porto",84,80],["Sporting Braga",79,76],["Vitória Guimarães",74,74],["Gil Vicente",71,72],["Santa Clara",69,70],["Famalicão",70,70],["Moreirense",68,69],["Rio Ave",68,69],["Casa Pia",67,68],["Estoril Praia",68,68],["FC Arouca",67,68],["Nacional",66,67],["AVS",65,66],["Alverca",65,66],["Estrela Amadora",65,65],["Tondela",64,65]]},
+{country:"Pays-Bas",league:"Eredivisie",teams:[["Ajax",81,76],["PSV Eindhoven",83,77],["Feyenoord",80,76],["AZ Alkmaar",77,75],["FC Twente",76,74],["FC Utrecht",73,73],["Go Ahead Eagles",70,71],["NEC Nijmegen",69,70],["Sparta Rotterdam",69,70],["Fortuna Sittard",67,68],["Heracles Almelo",67,68],["Willem II",66,67],["FC Groningen",68,69],["FC Volendam",65,67],["NAC Breda",66,67],["PEC Zwolle",65,66],["Telstar",64,65],["Excelsior",64,65]]},
+{country:"Belgique",league:"Jupiler Pro League",teams:[["Club Bruges",82,79],["Anderlecht",78,75],["Union Saint-Gilloise",80,78],["KRC Genk",78,76],["Royal Antwerp",76,74],["KAA Gand",75,74],["Standard de Liège",72,72],["Sporting Charleroi",70,71],["Cercle Bruges",69,70],["KV Mechelen",68,69],["Westerlo",67,68],["OH Louvain",67,68],["STVV",66,67],["Dender",65,66],["Beerschot",64,65],["KV Courtrai",64,65]]},
+{country:"Turquie",league:"Süper Lig",teams:[["Galatasaray",84,79],["Fenerbahçe",83,78],["Beşiktaş",79,76],["Trabzonspor",77,75],["Başakşehir",73,73],["Samsunspor",71,72],["Kasımpaşa",70,71],["Konyaspor",69,70],["Sivasspor",68,70],["Antalyaspor",68,69],["Alanyaspor",68,69],["Gaziantep FK",67,68],["Kayserispor",67,68],["Çaykur Rizespor",66,67],["Göztepe",68,68],["Eyüpspor",66,67],["Kocaelispor",65,66],["Gençlerbirliği",65,66],["Fatih Karagümrük",65,66],["Bodrum FK",64,65]]},
+{country:"Écosse",league:"Premiership",teams:[["Celtic",83,78],["Rangers",80,76],["Aberdeen",73,72],["Heart of Midlothian",74,73],["Hibernian",72,72],["Dundee United",69,70],["St Mirren",68,69],["Motherwell",67,68],["Kilmarnock",66,67],["Dundee FC",66,67],["Ross County",65,66],["Falkirk",64,65]]},
+{country:"Brésil",league:"Brasileirão Série A",teams:[["Palmeiras",85,80],["Flamengo",86,79],["Botafogo",82,78],["São Paulo",79,77],["Fluminense",78,76],["Atlético Mineiro",80,77],["Internacional",78,76],["Grêmio",78,75],["Corinthians",77,75],["Cruzeiro",76,75],["Bahia",74,73],["Fortaleza",73,73],["Vasco da Gama",73,72],["Bragantino",73,73],["Athletico Paranaense",74,73],["Santos",74,72],["Vitória",70,71],["Juventude",68,69],["Ceará",68,69],["Mirassol",68,68]]},
+{country:"Argentine",league:"Primera División",teams:[["River Plate",85,79],["Boca Juniors",83,79],["Racing Club",78,76],["Independiente",76,75],["San Lorenzo",74,74],["Estudiantes",75,74],["Talleres",76,75],["Vélez Sarsfield",75,74],["Argentinos Juniors",73,73],["Rosario Central",73,73],["Newell's Old Boys",72,72],["Lanús",71,72],["Huracán",70,71],["Defensa y Justicia",71,71],["Godoy Cruz",70,70],["Tigre",69,70],["Banfield",68,69],["Platense",68,69],["Barracas Central",67,68],["Instituto",67,67]]},
+{country:"États-Unis",league:"MLS",teams:[["Inter Miami CF",84,74],["LAFC",79,75],["LA Galaxy",77,74],["Seattle Sounders",77,75],["Columbus Crew",78,75],["FC Cincinnati",77,74],["Philadelphia Union",76,75],["New York City FC",75,74],["New York Red Bulls",74,74],["Orlando City",74,73],["Atlanta United",75,73],["Nashville SC",73,74],["Charlotte FC",72,73],["Austin FC",72,72],["Real Salt Lake",72,72],["Portland Timbers",73,72],["Minnesota United",71,72],["Sporting Kansas City",71,72],["FC Dallas",70,71],["Houston Dynamo",70,71],["San Diego FC",71,70],["St. Louis City SC",70,70],["Chicago Fire",69,70],["D.C. United",68,69]]},
+{country:"Arabie Saoudite",league:"Saudi Pro League",teams:[["Al-Hilal",87,80],["Al-Nassr",86,78],["Al-Ittihad",84,78],["Al-Ahli",82,77],["Al-Ettifaq",76,74],["Al-Taawoun",71,72],["Al-Fateh",70,71],["Al-Shabab",71,71],["Damac",68,69],["Al-Fayha",68,69],["Al-Riyadh",67,68],["Al-Khaleej",67,68],["Al-Okhdood",66,67],["Al-Qadsiah",70,70],["Al-Hazem",65,66],["Al-Kholood",65,66],["Neom SC",64,65],["Najran",63,64]]},
+{country:"International",league:"Équipes nationales",teams:[["Brésil",89,82],["Argentine",90,85],["France",89,84],["Angleterre",86,82],["Espagne",88,84],["Portugal",87,81],["Allemagne",85,81],["Pays-Bas",84,80],["Italie",82,81],["Belgique",83,78],["Croatie",81,79],["Uruguay",80,79],["Colombie",80,77],["Maroc",78,79],["États-Unis",76,75],["Mexique",77,75],["Japon",78,76],["Corée du Sud",77,75],["Sénégal",78,77],["Nigeria",76,74],["Ghana",74,73],["Côte d'Ivoire",76,74],["Algérie",74,73],["Tunisie",72,73],["Égypte",74,73],["Cameroun",74,72],["Suisse",79,78],["Danemark",78,77],["Suède",74,73],["Norvège",77,72],["Pologne",75,74],["Autriche",78,75],["Serbie",77,74],["Ukraine",76,75],["Turquie",76,74],["Écosse",73,74],["Pays de Galles",72,73],["Canada",74,73],["Équateur",73,74],["Chili",72,72],["Pérou",70,71],["Venezuela",70,70],["Australie",72,73],["Arabie Saoudite",70,70],["Qatar",68,69],["Iran",73,74]]}
+];
+
+/* ===================== ETAT & HELPERS ===================== */
+let state = { screen: "loading", tab: "predict", homeSel: null, awaySel: null, lastResult: null, adminFilter: "all", adminSearch: "" };
+let session = null;      // {token, pseudo, bookmakerId, expiresAt}
+let adminToken = null;
+let telegramContact = "@Mrtekeng";
+let telegramBotUsername = null;
+let tapCount = 0, tapTimer = null;
+
+const $app = document.getElementById("app");
+function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg, type){
+  const el = document.createElement("div");
+  el.className = "toast" + (type ? " " + type : "");
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+function fmtDate(ts){ if(!ts) return "—"; const d = new Date(ts); return d.toLocaleDateString("fr-FR")+" "+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}); }
+function daysToMs(n){ return n*24*60*60*1000; }
+function saveLocal(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function loadLocal(k){ try{ const v = localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; } }
+
+async function api(path, method, body, token){
+  const res = await fetch("/api/" + path, {
+    method: method || "GET",
+    headers: Object.assign({ "Content-Type": "application/json" }, token ? { Authorization: "Bearer " + token } : {}),
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  let data = {};
+  try{ data = await res.json(); }catch(e){}
+  if(!res.ok){ const err = new Error(data.error || "erreur"); err.code = data.error; err.status = res.status; throw err; }
+  return data;
+}
+
+/* ===================== INITIALISATION ===================== */
+async function init(){
+  try{
+    const s = await api("public-settings", "GET");
+    if(s.telegramContact) telegramContact = s.telegramContact;
+    if(s.telegramBotUsername) telegramBotUsername = s.telegramBotUsername;
+  }catch(e){}
+
+  const savedSession = loadLocal("fpp_session");
+  if(savedSession && savedSession.expiresAt > Date.now()){
+    session = savedSession;
+    state.screen = "app";
+  } else {
+    session = null;
+    state.screen = "home";
+  }
+  render();
+}
+
+/* ===================== RENDU ===================== */
+function render(){
+  if(state.screen === "loading") return renderLoading();
+  if(state.screen === "home") return renderHome();
+  if(state.screen === "signup") return renderSignup();
+  if(state.screen === "login") return renderLogin();
+  if(state.screen === "app") return renderMainApp();
+  if(state.screen === "adminLogin") return renderAdminLogin();
+  if(state.screen === "adminDashboard") return renderAdminDashboard();
+}
+function renderLoading(){ $app.innerHTML = `<div class="wrap center-col"><div class="loader" style="margin-top:120px;"></div></div>`; }
+
+function renderHome(){
+  $app.innerHTML = `
+  <div class="wrap center-col">
+    <div class="logo-badge">⚽</div>
+    <h1 class="brand-title">FIFA Predict Pro</h1>
+    <p class="brand-sub">Analyses et prédictions de matchs basées sur les statistiques</p>
+    <div class="stack" style="width:100%;margin-top:34px;">
+      <button class="btn btn-primary" onclick="goto('login')">Connexion</button>
+      <button class="btn btn-outline" onclick="goto('signup')">Inscription</button>
+    </div>
+    <div class="telegram-box">
+      <p class="small">Vous n'avez pas encore de code d'accès ?</p>
+      <p class="small" style="margin-top:4px;">Contactez-nous sur Telegram :
+        <a href="https://t.me/${encodeURIComponent(telegramContact.replace('@',''))}" target="_blank" rel="noopener">${escapeHtml(telegramContact)}</a>
+      </p>
+    </div>
+    <div class="tap-zone" onclick="adminTap()" aria-hidden="true"></div>
+  </div>`;
+}
+function adminTap(){
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(()=>{ tapCount = 0; }, 2500);
+  if(tapCount >= 8){ tapCount = 0; state.screen = "adminLogin"; render(); }
+}
+function goto(screen){ state.screen = screen; render(); }
+
+function renderSignup(){
+  $app.innerHTML = `
+  <div class="wrap">
+    <button class="btn-ghost" onclick="goto('home')">‹ Retour</button>
+    <h2 style="margin-top:10px;font-size:26px;">Créer un compte</h2>
+    <p class="small" style="margin-top:6px;">Renseignez vos informations. Un code d'accès vous sera communiqué manuellement sur Telegram après validation.</p>
+    <div class="stack" style="margin-top:20px;">
+      <div class="field"><label>Nom ou pseudo</label><input id="su_pseudo" placeholder="Ex : Yannick23"></div>
+      <div class="field"><label>Identifiant du bookmaker</label><input id="su_bkid" placeholder="Ex : 1xBet-458212"></div>
+      <div class="field"><label>Numéro de téléphone (facultatif)</label><input id="su_phone" placeholder="Ex : +225 07 00 00 00 00"></div>
+      <div class="field"><label>Nom d'utilisateur Telegram (facultatif, sans @)</label><input id="su_tg" placeholder="Ex : yannick23"></div>
+      <button class="btn btn-primary" id="su_btn" onclick="submitSignup()">S'inscrire</button>
+    </div>
+  </div>`;
+}
+async function submitSignup(){
+  const pseudo = document.getElementById("su_pseudo").value.trim();
+  const bookmakerId = document.getElementById("su_bkid").value.trim();
+  const phone = document.getElementById("su_phone").value.trim();
+  const telegramUsername = document.getElementById("su_tg").value.trim();
+  if(!pseudo || !bookmakerId){ toast("Nom/pseudo et identifiant bookmaker requis.", "err"); return; }
+  const btn = document.getElementById("su_btn"); btn.textContent="Envoi…"; btn.disabled=true;
+  try{
+    await api("signup", "POST", { pseudo, bookmakerId, phone, telegramUsername });
+    $app.innerHTML = `
+    <div class="wrap center-col">
+      <div class="logo-badge">✅</div>
+      <h2 style="margin-top:8px;">Inscription réussie</h2>
+      <p style="margin-top:10px;max-width:320px;">Contactez ${escapeHtml(telegramContact)} sur Telegram afin d'obtenir votre code d'accès.</p>
+      ${telegramBotUsername ? `<p class="small" style="margin-top:14px;max-width:320px;">Pour recevoir votre code plus vite, démarrez aussi notre bot : <a href="https://t.me/${encodeURIComponent(telegramBotUsername)}" target="_blank" rel="noopener">@${escapeHtml(telegramBotUsername)}</a> puis envoyez <b>/start</b>.</p>` : ``}
+      <button class="btn btn-outline" style="margin-top:24px;max-width:220px;" onclick="goto('home')">Retour à l'accueil</button>
+    </div>`;
+  }catch(e){
+    toast("Erreur lors de l'inscription. Réessayez.", "err");
+    btn.textContent="S'inscrire"; btn.disabled=false;
+  }
+}
+
+function renderLogin(){
+  $app.innerHTML = `
+  <div class="wrap">
+    <button class="btn-ghost" onclick="goto('home')">‹ Retour</button>
+    <h2 style="margin-top:10px;font-size:26px;">Connexion</h2>
+    <div class="stack" style="margin-top:20px;">
+      <div class="field"><label>Identifiant bookmaker</label><input id="lg_bkid" placeholder="Ex : 1xBet-458212"></div>
+      <div class="field"><label>Code d'accès</label><input id="lg_code" placeholder="FP-XXXX-XXXX" style="text-transform:uppercase;"></div>
+      <button class="btn btn-primary" id="lg_btn" onclick="submitLogin()">Se connecter</button>
+      <p class="small" id="lg_error" style="color:var(--red);"></p>
+    </div>
+  </div>`;
+}
+async function submitLogin(){
+  const bookmakerId = document.getElementById("lg_bkid").value.trim();
+  const code = document.getElementById("lg_code").value.trim().toUpperCase();
+  const errEl = document.getElementById("lg_error"); errEl.textContent = "";
+  if(!bookmakerId || !code){ errEl.textContent = "Veuillez remplir les deux champs."; return; }
+  const btn = document.getElementById("lg_btn"); btn.textContent = "Vérification…"; btn.disabled = true;
+  try{
+    const data = await api("login", "POST", { bookmakerId, code });
+    session = { token: data.token, pseudo: data.pseudo, bookmakerId: data.bookmakerId, expiresAt: data.expiresAt };
+    saveLocal("fpp_session", session);
+    state.screen = "app"; state.tab = "predict";
+    render();
+  }catch(e){
+    if(e.code === "expired") errEl.textContent = "Votre code d'accès a expiré. Contactez " + telegramContact + " pour renouveler votre accès.";
+    else if(e.code === "disabled") errEl.textContent = "Votre compte a été désactivé. Contactez " + telegramContact + ".";
+    else errEl.textContent = "Identifiant ou code d'accès invalide.";
+    btn.textContent = "Se connecter"; btn.disabled = false;
+  }
+}
+function logout(){ session = null; try{ localStorage.removeItem("fpp_session"); }catch(e){} state.screen = "home"; render(); }
+
+/* ===================== APPLICATION PRINCIPALE ===================== */
+function allTeamsFlat(){
+  const list = [];
+  TEAM_DATA.forEach(block=> block.teams.forEach(t=> list.push({country:block.country, league:block.league, name:t[0], att:t[1], def:t[2]})));
+  return list;
+}
+function renderMainApp(){
+  const optionsHtml = TEAM_DATA.map(block=>{
+    const opts = block.teams.map(t=>`<option value="${escapeHtml(block.country+'|'+block.league+'|'+t[0])}">${escapeHtml(t[0])}</option>`).join("");
+    return `<optgroup label="${escapeHtml(block.country+' — '+block.league)}">${opts}</optgroup>`;
+  }).join("");
+  window.__opts = optionsHtml;
+
+  $app.innerHTML = `
+  <div class="header-app">
+    <div>
+      <div style="font-family:var(--font-head);font-weight:700;font-size:16px;">⚽ FIFA Predict Pro</div>
+      <div class="row small" style="margin-top:2px;"><span class="status-dot"></span>&nbsp;Connecté · ${escapeHtml(session.bookmakerId)}</div>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="logout()">Déconnexion</button>
+  </div>
+  <div class="wrap" style="padding-top:16px;">
+    <div class="tabbar">
+      <button class="${state.tab==='predict'?'active':''}" onclick="setTab('predict')">Prédiction</button>
+      <button class="${state.tab==='history'?'active':''}" onclick="setTab('history')">Historique</button>
+    </div>
+    <div id="tabcontent"></div>
+  </div>`;
+  if(state.tab === "predict") renderPredictTab(); else renderHistoryTab();
+}
+function setTab(t){ state.tab = t; renderMainApp(); }
+function findTeam(val){
+  if(!val) return null;
+  const [country,league,name] = val.split("|");
+  const block = TEAM_DATA.find(b=>b.country===country && b.league===league);
+  if(!block) return null;
+  const t = block.teams.find(x=>x[0]===name);
+  return t ? {country,league,name:t[0],att:t[1],def:t[2]} : null;
+}
+function renderPredictTab(){
+  const el = document.getElementById("tabcontent");
+  const opts = window.__opts;
+  el.innerHTML = `
+  <div class="stack">
+    <div class="team-select">
+      <label>Domicile</label>
+      <select id="sel_home" onchange="onTeamChange()"><option value="">— Choisir une équipe —</option>${opts}</select>
+      <div id="home_stats"></div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="team-select">
+      <label>Extérieur</label>
+      <select id="sel_away" onchange="onTeamChange()"><option value="">— Choisir une équipe —</option>${opts}</select>
+      <div id="away_stats"></div>
+    </div>
+    <button class="btn btn-primary" onclick="analyze()">🔎 Analyser &amp; Prédire</button>
+    <div id="result_zone"></div>
+  </div>`;
+  if(state.homeSel) document.getElementById("sel_home").value = state.homeSel;
+  if(state.awaySel) document.getElementById("sel_away").value = state.awaySel;
+  onTeamChange();
+  if(state.lastResult) showResult(state.lastResult);
+}
+function onTeamChange(){
+  state.homeSel = document.getElementById("sel_home").value;
+  state.awaySel = document.getElementById("sel_away").value;
+  const h = findTeam(state.homeSel), a = findTeam(state.awaySel);
+  document.getElementById("home_stats").innerHTML = h ? statChips(h) : "";
+  document.getElementById("away_stats").innerHTML = a ? statChips(a) : "";
+}
+function statChips(t){ return `<div class="stat-line"><div class="stat-chip"><div class="num">${t.att}</div><div class="lbl">ATT</div></div><div class="stat-chip"><div class="num">${t.def}</div><div class="lbl">DEF</div></div></div>`; }
+
+function analyze(){
+  const h = findTeam(state.homeSel), a = findTeam(state.awaySel);
+  if(!h || !a){ toast("Sélectionnez les deux équipes.", "err"); return; }
+  if(h.name === a.name && h.league===a.league){ toast("Choisissez deux équipes différentes.", "err"); return; }
+
+  const homeAdv = 5;
+  const homeScore = (h.att - a.def) + homeAdv;
+  const awayScore = (a.att - h.def);
+  const drawFactor = 12 - Math.min(10, Math.abs(homeScore-awayScore)/4);
+  const expHome = Math.exp(homeScore/12), expAway = Math.exp(awayScore/12), expDraw = Math.exp(drawFactor/12)*0.9;
+  const total = expHome+expAway+expDraw;
+  const pHome = Math.round(expHome/total*100), pAway = Math.round(expAway/total*100), pDraw = Math.max(0,100-pHome-pAway);
+
+  const homeGoals = Math.max(0.4, 1.35 + (h.att-a.def)/28);
+  const awayGoals = Math.max(0.3, 1.05 + (a.att-h.def)/28);
+  const totalGoals = homeGoals+awayGoals;
+  const over25 = Math.min(92, Math.max(15, Math.round((totalGoals-1.2)*38)));
+  const btts = Math.min(90, Math.max(20, Math.round(Math.min(homeGoals,awayGoals)*48)));
+
+  const maxP = Math.max(pHome,pDraw,pAway);
+  let mainPred = maxP===pHome ? "Victoire "+h.name : maxP===pAway ? "Victoire "+a.name : "Match nul";
+  const confidence = maxP >= 55 ? "Élevé" : maxP >= 40 ? "Moyen" : "Faible";
+
+  const result = { h, a, pHome, pDraw, pAway, mainPred, confidence, over25, btts, totalGoals: totalGoals.toFixed(2) };
+  state.lastResult = result;
+  showResult(result);
+  saveHistory(result);
+}
+function showResult(r){
+  const zone = document.getElementById("result_zone");
+  if(!zone) return;
+  zone.innerHTML = `
+  <div class="result-hero" style="margin-top:6px;">
+    <div class="small" style="letter-spacing:.5px;">PRÉDICTION PRINCIPALE</div>
+    <div class="big">${escapeHtml(r.mainPred)}</div>
+    <div class="small" style="margin-top:4px;">Niveau de confiance : ${r.confidence}</div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="row-between small"><span>Domicile ${r.pHome}%</span><span>Nul ${r.pDraw}%</span><span>Extérieur ${r.pAway}%</span></div>
+    <div class="probbar"><span style="width:${r.pHome}%;background:var(--green);"></span><span style="width:${r.pDraw}%;background:var(--amber);"></span><span style="width:${r.pAway}%;background:var(--blue);"></span></div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="row-between"><span class="small">Tendance buts (total estimé)</span><b>${r.totalGoals}</b></div>
+    <div class="divider"></div>
+    <div class="row-between"><span class="small">Les deux équipes marquent</span><b>${r.btts}%</b></div>
+    <div class="divider"></div>
+    <div class="row-between"><span class="small">Plus de 2,5 buts</span><b>${r.over25}%</b></div>
+    <div class="divider"></div>
+    <p class="small">Statistiques utilisées : ${escapeHtml(r.h.name)} (ATT ${r.h.att} · DEF ${r.h.def}) vs ${escapeHtml(r.a.name)} (ATT ${r.a.att} · DEF ${r.a.def}).</p>
+  </div>
+  <p class="small" style="margin-top:10px;text-align:center;">Estimations statistiques à titre informatif — ne constituent pas un conseil de paris.</p>`;
+}
+async function saveHistory(r){
+  try{ await api("history", "POST", { match: r.h.name+" vs "+r.a.name, prediction: r.mainPred, confidence: r.confidence, pHome:r.pHome, pDraw:r.pDraw, pAway:r.pAway }, session.token); }catch(e){}
+}
+async function renderHistoryTab(){
+  const el = document.getElementById("tabcontent");
+  el.innerHTML = `<div class="loader" style="margin-top:40px;"></div>`;
+  try{
+    const data = await api("history", "GET", null, session.token);
+    const rows = data.history || [];
+    if(rows.length===0){ el.innerHTML = `<p class="muted" style="text-align:center;margin-top:30px;">Aucune analyse pour l'instant.</p>`; return; }
+    el.innerHTML = `<div class="stack">` + rows.map(h=>`
+      <div class="hist-item">
+        <div class="row-between"><b>${escapeHtml(h.match)}</b><span class="small">${fmtDate(h.createdAt)}</span></div>
+        <div class="row-between small" style="margin-top:6px;"><span>${escapeHtml(h.prediction)}</span><span>Confiance : ${escapeHtml(h.confidence)}</span></div>
+      </div>`).join("") + `</div>`;
+  }catch(e){ el.innerHTML = `<p class="muted" style="text-align:center;margin-top:30px;">Impossible de charger l'historique.</p>`; }
+}
+
+/* ===================== ADMINISTRATION ===================== */
+function renderAdminLogin(){
+  $app.innerHTML = `
+  <div class="wrap center-col">
+    <div class="logo-badge">🔒</div>
+    <h2 style="margin-top:10px;">Espace administrateur</h2>
+    <div class="stack" style="width:100%;margin-top:18px;">
+      <div class="field">
+        <label>Mot de passe administrateur</label>
+        <div class="row" style="gap:8px;">
+          <input id="adm_pass" type="password" placeholder="••••••••" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" style="flex:1;">
+          <button class="btn-sm btn-outline" type="button" onclick="document.getElementById('adm_pass').type = document.getElementById('adm_pass').type==='password'?'text':'password';" style="min-height:46px;">Afficher</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="submitAdminLogin()">Entrer</button>
+      <button class="btn btn-ghost" onclick="goto('home')">Annuler</button>
+      <p class="small" id="adm_err" style="color:var(--red);"></p>
+    </div>
+  </div>`;
+}
+async function submitAdminLogin(){
+  const pass = document.getElementById("adm_pass").value.trim();
+  const errEl = document.getElementById("adm_err");
+  try{
+    const data = await api("admin-login", "POST", { password: pass });
+    adminToken = data.token;
+    if(data.telegramContact) telegramContact = data.telegramContact;
+    if(data.telegramBotUsername) telegramBotUsername = data.telegramBotUsername;
+    state.screen = "adminDashboard";
+    render();
+  }catch(e){ errEl.textContent = "Mot de passe incorrect."; }
+}
+function adminLogout(){ adminToken = null; state.screen = "home"; render(); }
+
+async function renderAdminDashboard(){
+  $app.innerHTML = `
+  <div class="header-app">
+    <div style="font-family:var(--font-head);font-weight:700;font-size:16px;">🛠 Administration</div>
+    <button class="btn btn-outline btn-sm" onclick="adminLogout()">Quitter</button>
+  </div>
+  <div class="wrap" style="padding-top:16px;">
+    <div class="stat-grid" id="adm_stats"><div class="loader"></div></div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Créer un accès utilisateur</h3>
+      <div class="field"><label>Nom / pseudo</label><input id="na_pseudo"></div>
+      <div class="field"><label>Identifiant bookmaker</label><input id="na_bkid"></div>
+      <div class="field">
+        <label>Durée d'accès</label>
+        <select id="na_duration">
+          <option value="1">1 jour</option><option value="3">3 jours</option>
+          <option value="7" selected>7 jours</option><option value="15">15 jours</option>
+          <option value="30">30 jours</option><option value="60">60 jours</option>
+          <option value="90">90 jours</option><option value="custom">Durée personnalisée</option>
+        </select>
+      </div>
+      <div class="field hidden" id="na_custom_wrap"><label>Nombre de jours</label><input id="na_custom" type="number" min="1"></div>
+      <div class="field">
+        <label>Chat ID Telegram du client (facultatif — pour lui envoyer le code automatiquement)</label>
+        <input id="na_tgchat" placeholder="Ex : 123456789">
+      </div>
+      <button class="btn btn-primary" onclick="createAccess()">Générer le code d'accès</button>
+      <div id="na_result"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="row-between" style="margin-bottom:10px;"><h3>Contacts Telegram récents</h3><button class="btn-sm btn-outline" onclick="loadTelegramContacts()">Actualiser</button></div>
+      <p class="small">Les personnes qui ont envoyé <code>/start</code> à votre bot apparaissent ici. Copiez leur Chat ID pour l'utiliser ci-dessus.</p>
+      <div id="tg_contacts" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-bottom:10px;">Demandes en attente</h3>
+      <div id="adm_pending"><div class="loader"></div></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="row-between" style="margin-bottom:10px;"><h3>Utilisateurs</h3></div>
+      <input placeholder="Rechercher (nom, identifiant, statut)" id="adm_search" style="margin-bottom:10px;" oninput="onAdminSearch()">
+      <div>${["all","actif","expire","desactive"].map(f=>`<button class="chip-filter ${state.adminFilter===f?'active':''}" onclick="setAdminFilter('${f}')">${f==='all'?'Tous':f==='actif'?'Actifs':f==='expire'?'Expirés':'Désactivés'}</button>`).join("")}</div>
+      <div class="table-scroll" style="margin-top:10px;"><div id="adm_table"><div class="loader" style="margin:20px auto;"></div></div></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-bottom:10px;">Sécurité administrateur</h3>
+      <div class="field"><label>Ancien mot de passe</label><input id="sp_old" type="password"></div>
+      <div class="field"><label>Nouveau mot de passe</label><input id="sp_new" type="password"></div>
+      <div class="field"><label>Confirmer le nouveau mot de passe</label><input id="sp_confirm" type="password"></div>
+      <button class="btn btn-outline" onclick="changeAdminPassword()">Enregistrer le nouveau mot de passe</button>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-bottom:12px;">⚙️ Configuration &amp; migration</h3>
+
+      <p class="small" style="margin-bottom:10px;"><b>Contact Telegram public</b> (affiché aux visiteurs sur l'accueil)</p>
+      <div class="field"><input id="tg_contact" value="${escapeHtml(telegramContact)}" placeholder="@Mrtekeng"></div>
+      <button class="btn btn-outline btn-sm" onclick="saveTelegramContact()">Enregistrer</button>
+
+      <div class="divider"></div>
+      <p class="small" style="margin-bottom:10px;"><b>Chat ID admin</b> (où vous recevez les notifications d'inscription)</p>
+      <div class="field"><input id="tg_admin_chat" placeholder="Ex : 123456789"></div>
+      <p class="small" style="margin-bottom:10px;"><b>Nom d'utilisateur du bot</b> (sans @, pour le lien "démarrer le bot")</p>
+      <div class="field"><input id="tg_bot_username" placeholder="Ex : fifapredictpro_bot"></div>
+      <button class="btn btn-outline btn-sm" onclick="saveTelegramAdminSettings()">Enregistrer</button>
+
+      <div class="divider"></div>
+      <p class="small" style="margin-bottom:8px;"><b>Variables d'environnement Netlify utilisées</b> (déjà configurées, listées ici pour mémoire) :</p>
+      <div class="stack small" style="gap:6px;">
+        <div class="row-between"><code>JWT_SECRET</code><span class="muted">signature des sessions</span></div>
+        <div class="row-between"><code>ADMIN_BOOTSTRAP_PASSWORD</code><span class="muted">mot de passe admin initial</span></div>
+        <div class="row-between"><code>TELEGRAM_BOT_TOKEN</code><span class="muted">token du bot (secret)</span></div>
+        <div class="row-between"><code>TELEGRAM_ADMIN_CHAT_ID</code><span class="muted">valeur par défaut (facultatif)</span></div>
+        <div class="row-between"><code>DEFAULT_TELEGRAM_CONTACT</code><span class="muted">valeur par défaut (facultatif)</span></div>
+      </div>
+
+      <div class="divider"></div>
+      <p class="small" style="margin-bottom:8px;"><b>Migration future vers une vraie base (ex. Supabase)</b></p>
+      <p class="small">Ce projet utilise Netlify Blobs — largement suffisant jusqu'à quelques milliers de comptes. Le jour où vous voulez migrer :</p>
+      <ol class="small" style="padding-left:18px;margin-top:6px;">
+        <li>Cliquez sur "Exporter toutes les données" ci-dessous : vous obtenez un fichier JSON avec tous les comptes, demandes et historiques.</li>
+        <li>Revenez me voir avec ce fichier et dites "je veux migrer vers Supabase" : je regénère les fonctions pour Supabase (déjà fait une fois pour ce projet) et j'écris un petit script qui importe ce JSON dans les tables Supabase.</li>
+        <li>Vous gardez le même frontend, seule la façon dont les données sont stockées change.</li>
+      </ol>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="exportAllData()">📦 Exporter toutes les données (JSON)</button>
+    </div>
+  </div>
+  <div id="adm_modal_root"></div>`;
+
+  document.getElementById("na_duration").addEventListener("change", e=>{
+    document.getElementById("na_custom_wrap").classList.toggle("hidden", e.target.value !== "custom");
+  });
+
+  loadAdminStatsAndTable();
+  loadPendingRequests();
+  loadTelegramContacts();
+  loadAdminSettingsPanel();
+}
+
+async function loadAdminStatsAndTable(){
+  try{ const data = await api("admin-list", "GET", null, adminToken); window.__accounts = data.accounts || []; }
+  catch(e){ window.__accounts = []; }
+  renderAdminStats();
+  renderAdminTable();
+}
+function renderAdminStats(){
+  const accs = window.__accounts || [];
+  const now = Date.now();
+  const active = accs.filter(a=>a.status==="actif" && (!a.expiresAt || a.expiresAt>now)).length;
+  const expired = accs.filter(a=>a.status==="actif" && a.expiresAt && a.expiresAt<=now).length;
+  const disabled = accs.filter(a=>a.status==="desactive").length;
+  const el = document.getElementById("adm_stats");
+  if(!el) return;
+  el.innerHTML = `
+    <div class="stat-box"><div class="n" style="color:var(--green);">${accs.length}</div><div class="l">Utilisateurs totaux</div></div>
+    <div class="stat-box"><div class="n" style="color:var(--green);">${active}</div><div class="l">Codes actifs</div></div>
+    <div class="stat-box"><div class="n" style="color:var(--amber);">${expired}</div><div class="l">Codes expirés</div></div>
+    <div class="stat-box"><div class="n" style="color:var(--red);">${disabled}</div><div class="l">Codes désactivés</div></div>`;
+}
+function setAdminFilter(f){ state.adminFilter = f; renderAdminTable(); }
+function onAdminSearch(){ state.adminSearch = document.getElementById("adm_search").value.toLowerCase(); renderAdminTable(); }
+function accountRealStatus(a){
+  if(a.status === "desactive") return "desactive";
+  if(a.expiresAt && a.expiresAt < Date.now()) return "expire";
+  return "actif";
+}
+function renderAdminTable(){
+  const el = document.getElementById("adm_table");
+  if(!el) return;
+  let accs = window.__accounts || [];
+  if(state.adminFilter !== "all") accs = accs.filter(a=> accountRealStatus(a) === state.adminFilter);
+  if(state.adminSearch){
+    accs = accs.filter(a => (a.pseudo||"").toLowerCase().includes(state.adminSearch) || (a.bookmakerId||"").toLowerCase().includes(state.adminSearch) || accountRealStatus(a).includes(state.adminSearch));
+  }
+  if(accs.length===0){ el.innerHTML = `<p class="muted small" style="padding:14px;">Aucun utilisateur.</p>`; return; }
+  el.innerHTML = `<table class="admin-table"><thead><tr><th>Nom</th><th>Identifiant</th><th>Inscription</th><th>Expiration</th><th>Statut</th><th>Actions</th></tr></thead><tbody>
+  ${accs.map(a=>{
+    const st = accountRealStatus(a);
+    const pillClass = st==="actif"?"pill-active":st==="expire"?"pill-expired":"pill-disabled";
+    const pillLabel = st==="actif"?"Actif":st==="expire"?"Expiré":"Désactivé";
+    return `<tr>
+      <td>${escapeHtml(a.pseudo||"—")}</td>
+      <td>${escapeHtml(a.bookmakerId||"—")}</td>
+      <td>${fmtDate(a.registeredAt)}</td>
+      <td>${fmtDate(a.expiresAt)}</td>
+      <td><span class="pill ${pillClass}">${pillLabel}</span></td>
+      <td>
+        <button class="btn-sm btn-outline" onclick="viewAccount('${a.id}')">Voir</button>
+        ${st==="desactive" ? `<button class="btn-sm btn-outline" onclick="accountAction('${a.id}','enable')">Réactiver</button>` : `<button class="btn-sm btn-outline" onclick="accountAction('${a.id}','disable')">Désactiver</button>`}
+        <button class="btn-sm btn-danger" onclick="deleteAccount('${a.id}')">Supprimer</button>
+      </td>
+    </tr>`;
+  }).join("")}
+  </tbody></table>`;
+}
+function findAccount(id){ return (window.__accounts||[]).find(a=>a.id===id); }
+function viewAccount(id){
+  const a = findAccount(id); if(!a) return;
+  const root = document.getElementById("adm_modal_root");
+  root.innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal-sheet">
+      <h3 style="margin-bottom:14px;">${escapeHtml(a.pseudo||"—")}</h3>
+      <div class="stack small">
+        <div class="row-between"><span>Identifiant</span><b>${escapeHtml(a.bookmakerId||"—")}</b></div>
+        <div class="row-between"><span>Créé le</span><b>${fmtDate(a.registeredAt)}</b></div>
+        <div class="row-between"><span>Expire le</span><b>${fmtDate(a.expiresAt)}</b></div>
+        <div class="row-between"><span>Statut</span><b>${escapeHtml(accountRealStatus(a))}</b></div>
+        <div class="row-between"><span>Dernière connexion</span><b>${fmtDate(a.lastLogin)}</b></div>
+      </div>
+      <div class="divider"></div>
+      <div class="field"><label>Renouveler l'accès (jours)</label><input id="rn_days" type="number" min="1" value="7"></div>
+      <button class="btn btn-primary" onclick="renewAccount('${a.id}')">Renouveler l'accès</button>
+      <button class="btn btn-outline" style="margin-top:10px;" onclick="regenCode('${a.id}')">Générer un nouveau code</button>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="closeModal()">Fermer</button>
+    </div>
+  </div>`;
+}
+function closeModal(){ document.getElementById("adm_modal_root").innerHTML = ""; }
+async function accountAction(id, action, extra){
+  try{ await api("admin-account", "POST", Object.assign({ id, action }, extra||{}), adminToken); loadAdminStatsAndTable(); }
+  catch(e){ toast("Erreur lors de l'opération.", "err"); }
+}
+async function deleteAccount(id){
+  if(!confirm("Supprimer définitivement ce compte ? Cette action est irréversible.")) return;
+  await accountAction(id, "delete");
+  toast("Compte supprimé.", "ok");
+}
+async function renewAccount(id){
+  const days = parseInt(document.getElementById("rn_days").value,10) || 7;
+  try{ await api("admin-account", "POST", { id, action:"renew", days }, adminToken); toast("Accès renouvelé.", "ok"); closeModal(); loadAdminStatsAndTable(); }
+  catch(e){ toast("Erreur lors du renouvellement.", "err"); }
+}
+async function regenCode(id){
+  if(!confirm("Générer un nouveau code d'accès pour cet utilisateur ? L'ancien code ne fonctionnera plus.")) return;
+  try{ const data = await api("admin-account", "POST", { id, action:"regen" }, adminToken); toast("Nouveau code : " + data.code, "ok"); closeModal(); loadAdminStatsAndTable(); }
+  catch(e){ toast("Erreur lors de la génération.", "err"); }
+}
+async function loadPendingRequests(){
+  const el = document.getElementById("adm_pending");
+  try{
+    const data = await api("pending", "GET", null, adminToken);
+    const rows = data.requests || [];
+    if(rows.length===0){ el.innerHTML = `<p class="muted small">Aucune demande en attente.</p>`; return; }
+    el.innerHTML = rows.map(r=>`
+      <div class="hist-item" style="margin-bottom:10px;">
+        <div class="row-between"><b>${escapeHtml(r.pseudo)}</b><span class="small">${fmtDate(r.requestedAt)}</span></div>
+        <div class="small">Identifiant : ${escapeHtml(r.bookmakerId)} ${r.phone? " · "+escapeHtml(r.phone):""} ${r.telegramUsername? " · @"+escapeHtml(r.telegramUsername):""}</div>
+        <button class="btn-sm btn-primary" style="margin-top:8px;" onclick="prefillFromRequest('${r.id}','${escapeHtml(r.pseudo).replace(/'/g,"\\'")}','${escapeHtml(r.bookmakerId).replace(/'/g,"\\'")}')">Créer l'accès</button>
+      </div>`).join("");
+  }catch(e){ el.innerHTML = `<p class="muted small">Impossible de charger les demandes.</p>`; }
+}
+window.__pendingReqId = null;
+function prefillFromRequest(reqId, pseudo, bkid){
+  document.getElementById("na_pseudo").value = pseudo;
+  document.getElementById("na_bkid").value = bkid;
+  window.__pendingReqId = reqId;
+  document.getElementById("na_pseudo").scrollIntoView({behavior:"smooth"});
+}
+async function createAccess(){
+  const pseudo = document.getElementById("na_pseudo").value.trim();
+  const bookmakerId = document.getElementById("na_bkid").value.trim();
+  const durSel = document.getElementById("na_duration").value;
+  const days = durSel === "custom" ? (parseInt(document.getElementById("na_custom").value,10)||1) : parseInt(durSel,10);
+  const telegramChatId = document.getElementById("na_tgchat").value.trim();
+  if(!pseudo || !bookmakerId){ toast("Nom et identifiant requis.", "err"); return; }
+  try{
+    const data = await api("admin-create-access", "POST", { pseudo, bookmakerId, days, telegramChatId, requestId: window.__pendingReqId }, adminToken);
+    window.__pendingReqId = null;
+    document.getElementById("na_result").innerHTML = `
+      <div class="divider"></div>
+      <p class="small">UTILISATEUR : <b>${escapeHtml(pseudo)}</b></p>
+      <p class="small">IDENTIFIANT : <b>${escapeHtml(bookmakerId)}</b></p>
+      <p class="small">DATE D'EXPIRATION : <b>${fmtDate(data.account.expiresAt)}</b></p>
+      <p class="small">STATUT : <b>Actif</b></p>
+      <div class="copy-code" style="margin-top:10px;">${data.code}</div>
+      <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="copyCode('${data.code}')">Copier le code</button>
+      ${data.telegramSent ? `<p class="small" style="margin-top:8px;color:var(--green);">✅ Code envoyé sur Telegram.</p>` : (telegramChatId ? `<p class="small" style="margin-top:8px;color:var(--amber);">⚠️ Envoi Telegram échoué — copiez le code manuellement.</p>` : ``)}`;
+    document.getElementById("na_pseudo").value=""; document.getElementById("na_bkid").value=""; document.getElementById("na_tgchat").value="";
+    toast("Code d'accès généré.", "ok");
+    loadAdminStatsAndTable(); loadPendingRequests();
+  }catch(e){ toast("Erreur lors de la génération de l'accès.", "err"); }
+}
+async function loadTelegramContacts(){
+  const el = document.getElementById("tg_contacts");
+  if(!el) return;
+  el.innerHTML = `<div class="loader" style="margin:10px auto;"></div>`;
+  try{
+    const data = await api("telegram-contacts", "GET", null, adminToken);
+    const rows = data.contacts || [];
+    if(rows.length===0){ el.innerHTML = `<p class="muted small">Aucun message reçu par le bot pour l'instant. Demandez au client d'envoyer /start au bot.</p>`; return; }
+    el.innerHTML = rows.map(c=>`
+      <div class="hist-item" style="margin-bottom:8px;">
+        <div class="row-between"><b>${c.username? "@"+escapeHtml(c.username) : escapeHtml(c.firstName||"Sans nom")}</b><span class="small">${fmtDate(c.date)}</span></div>
+        <div class="row-between" style="margin-top:6px;"><span class="small">Chat ID : ${c.chatId}</span><button class="btn-sm btn-outline" onclick="useTelegramChatId('${c.chatId}')">Utiliser</button></div>
+      </div>`).join("");
+  }catch(e){ el.innerHTML = `<p class="muted small">Impossible de charger les contacts Telegram.</p>`; }
+}
+function useTelegramChatId(chatId){
+  document.getElementById("na_tgchat").value = chatId;
+  document.getElementById("na_tgchat").scrollIntoView({behavior:"smooth"});
+  toast("Chat ID renseigné dans le formulaire.", "ok");
+}
+async function loadAdminSettingsPanel(){
+  try{
+    const data = await api("admin-settings", "GET", null, adminToken);
+    if(document.getElementById("tg_admin_chat")) document.getElementById("tg_admin_chat").value = data.telegramAdminChatId || "";
+    if(document.getElementById("tg_bot_username")) document.getElementById("tg_bot_username").value = data.telegramBotUsername || "";
+  }catch(e){}
+}
+async function saveTelegramAdminSettings(){
+  const telegramAdminChatId = document.getElementById("tg_admin_chat").value.trim();
+  const telegramBotUsername = document.getElementById("tg_bot_username").value.trim();
+  try{
+    await api("public-settings", "POST", { telegramAdminChatId, telegramBotUsername }, adminToken);
+    toast("Réglages Telegram admin mis à jour.", "ok");
+  }catch(e){ toast("Erreur lors de la mise à jour.", "err"); }
+}
+async function exportAllData(){
+  try{
+    const data = await api("admin-export", "GET", null, adminToken);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "fifa-predict-pro-export-" + new Date().toISOString().slice(0,10) + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("Export généré.", "ok");
+  }catch(e){ toast("Erreur lors de l'export.", "err"); }
+}
+function copyCode(code){ navigator.clipboard && navigator.clipboard.writeText(code).then(()=>toast("Code copié.", "ok")).catch(()=>toast("Copie impossible.", "err")); }
+async function changeAdminPassword(){
+  const oldPassword = document.getElementById("sp_old").value;
+  const newPassword = document.getElementById("sp_new").value;
+  const confirmP = document.getElementById("sp_confirm").value;
+  if(!oldPassword || !newPassword || !confirmP){ toast("Tous les champs sont requis.", "err"); return; }
+  if(newPassword !== confirmP){ toast("Les nouveaux mots de passe ne correspondent pas.", "err"); return; }
+  try{
+    await api("admin-password", "POST", { oldPassword, newPassword }, adminToken);
+    toast("Mot de passe administrateur mis à jour.", "ok");
+    document.getElementById("sp_old").value=""; document.getElementById("sp_new").value=""; document.getElementById("sp_confirm").value="";
+  }catch(e){ toast("Erreur : ancien mot de passe incorrect ou nouveau mot de passe trop court (6 caractères min).", "err"); }
+}
+async function saveTelegramContact(){
+  const val = document.getElementById("tg_contact").value.trim();
+  if(!val){ toast("Contact requis.", "err"); return; }
+  try{ await api("public-settings", "POST", { telegramContact: val }, adminToken); telegramContact = val; toast("Contact Telegram mis à jour.", "ok"); }
+  catch(e){ toast("Erreur lors de la mise à jour.", "err"); }
+}
+
+init();
+</script>
+</body>
+</html>
