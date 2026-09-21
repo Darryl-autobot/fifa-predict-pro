@@ -1,11 +1,19 @@
+
 const { getStore } = require("@netlify/blobs");
 
-// Chaque "store" est un espace de stockage nommé, indépendant.
-function accountsStore() { return getStore("accounts"); }
-function accountsIndexStore() { return getStore("accounts_index"); }
-function signupRequestsStore() { return getStore("signup_requests"); }
-function historyStore() { return getStore("history"); }
-function adminSettingsStore() { return getStore("admin_settings"); }
+function storeOpts(name) {
+  return {
+    name,
+    siteID: process.env.NETLIFY_SITE_ID,
+    token: process.env.NETLIFY_BLOBS_TOKEN,
+  };
+}
+
+function accountsStore() { return getStore(storeOpts("accounts")); }
+function accountsIndexStore() { return getStore(storeOpts("accounts_index")); }
+function signupRequestsStore() { return getStore(storeOpts("signup_requests")); }
+function historyStore() { return getStore(storeOpts("history")); }
+function adminSettingsStore() { return getStore(storeOpts("admin_settings")); }
 
 function indexKey(bookmakerIdLower) {
   return encodeURIComponent(bookmakerIdLower);
